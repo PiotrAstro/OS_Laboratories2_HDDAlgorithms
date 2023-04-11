@@ -1,4 +1,6 @@
 package HDDSimulator.RealTimeStrategy;
 
-public interface RealTimeStrategy {
+import HDDSimulator.Strategy.Strategy;
+
+public interface RealTimeStrategy extends Strategy {
 }

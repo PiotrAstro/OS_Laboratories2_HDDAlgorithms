@@ -26,7 +26,7 @@ public class RealTimeRequest extends Request {
 
     public void setFinishTime(int finishTime) {
         super.setFinishTime(finishTime);
-        isDeadlineMissed = finishTime > deadline;
+        isDeadlineMissed = finishTime > (deadline + getArrivalTime());
     }
 
     public void setDeadlineMissed(int finishTime) {

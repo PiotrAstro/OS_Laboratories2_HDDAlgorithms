@@ -33,4 +33,8 @@ public class Request {
     public boolean isFinished() {
         return isFinished;
     }
+
+    public int getWaitingTime() {
+        return finishTime - arrivalTime;
+    }
 }
