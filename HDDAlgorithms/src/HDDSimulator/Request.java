@@ -37,4 +37,8 @@ public class Request {
     public int getWaitingTime() {
         return finishTime - arrivalTime;
     }
+
+    public int distanceTo(int HDDNumber) {
+        return Math.abs(this.HDDNumber - HDDNumber);
+    }
 }

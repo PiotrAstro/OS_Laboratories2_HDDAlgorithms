@@ -4,10 +4,10 @@ import java.util.*;
 
 public class RequestList implements Iterable<Request> {
     private List<Request> list;
-    private boolean recentlyChanged;
+    private int changeCounter;
 
     public RequestList(int HDDNumberRange, int numberOfNormalReqests, int numberOfNormalRequestsAtStart, int arrivalTimeRange, int NumberOfRealTimeRequests, int minimumDeadline, int maximumDeadline) {
-        list = new ArrayList<>();
+        this();
 
         Random random = new Random();
 
@@ -22,12 +22,10 @@ public class RequestList implements Iterable<Request> {
         for(int i = 0; i < NumberOfRealTimeRequests; i++) {
             addRequest(new RealTimeRequest(random.nextInt(arrivalTimeRange), random.nextInt(HDDNumberRange), random.nextInt(maximumDeadline - minimumDeadline) + minimumDeadline));
         }
-
-        recentlyChanged = false;
     }
 
     public RequestList(RequestList copyFrom) {
-        list = new ArrayList<>();
+        this();
 
         for(Request request : copyFrom) {
             if(request instanceof RealTimeRequest) {
@@ -37,28 +35,21 @@ public class RequestList implements Iterable<Request> {
                 list.add(new Request(request));
             }
         }
-
-        recentlyChanged = false;
     }
 
     public RequestList() {
         list = new ArrayList<>();
-        recentlyChanged = false;
+        changeCounter = 0;
     }
 
     public void addRequest(Request request) {
         list.add(request);
-        recentlyChanged = true;
-    }
-
-    public void addRealTimeRequest(RealTimeRequest request) {
-        list.add(request);
-        recentlyChanged = true;
+        changeCounter++;
     }
 
     public void removeRequest(Request request) {
         list.remove(request);
-        recentlyChanged = true;
+        changeCounter++;
     }
 
     public Request getRequest(int index) {
@@ -95,7 +86,7 @@ public class RequestList implements Iterable<Request> {
 
     public void clear() {
         list.clear();
-        recentlyChanged = true;
+        changeCounter = 0;
     }
 
     public Request getClosestToHDDNumber(int HDDNumber) {
@@ -112,11 +103,15 @@ public class RequestList implements Iterable<Request> {
     }
 
     public void swithOfChanged() {
-        recentlyChanged = false;
+        changeCounter = 0;
     }
 
     public boolean getRecentlyChanged() {
-        return recentlyChanged;
+        return changeCounter > 0;
+    }
+
+    public int getChangeCounter() {
+        return changeCounter;
     }
 
     public void sortRequests(Comparator<Request> comparator) {
@@ -139,7 +134,7 @@ public class RequestList implements Iterable<Request> {
 
     public static class ComparatorByRealTime implements Comparator<Request> {
         private Comparator<Request> comparator;
-        private Comparator<RealTimeRequest> comparatorForRealTime;
+        private Comparator<? super RealTimeRequest> comparatorForRealTime;
 
         public ComparatorByRealTime(Comparator<Request> comparator) {
             this.comparator = comparator;

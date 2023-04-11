@@ -7,11 +7,12 @@ public class SSTF implements Strategy{
     private HDD hdd;
     private Request currentRequest;
 
-
+    public SSTF() {
+        currentRequest = null;
+    }
     @Override
     public void setHDD(HDD hdd) {
         this.hdd = hdd;
-        currentRequest = null;
     }
 
     @Override

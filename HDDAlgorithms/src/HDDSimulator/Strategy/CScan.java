@@ -3,9 +3,6 @@ package HDDSimulator.Strategy;
 import HDDSimulator.RequestList;
 
 public class CScan extends Scan{
-    public CScan() {
-        super();
-    }
 
     @Override
     public void doOneStep() {
@@ -14,12 +11,18 @@ public class CScan extends Scan{
             setCurrentRequestIndexInList();
         }
 
-        moveRight();
+
         if(hdd.getCurrentPosition() == hdd.getHDDRange() - 1) {
             hdd.setCurrentPosition(0);
             hdd.setDirectionRight(true);
             setCurrentRequestIndexInList();
+            hdd.decreaseDirectionChangesCounter();
         }
+        else {
+            hdd.moveRight();
+        }
+
+        scanRight();
     }
 
 

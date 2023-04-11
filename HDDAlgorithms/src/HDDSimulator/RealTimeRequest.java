@@ -33,4 +33,8 @@ public class RealTimeRequest extends Request {
         super.setFinishTime(finishTime);
         isDeadlineMissed = true;
     }
+
+    public boolean isAchieveable(int time) {
+        return time <= deadline + getArrivalTime();
+    }
 }

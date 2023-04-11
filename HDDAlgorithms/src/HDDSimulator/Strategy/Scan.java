@@ -5,32 +5,36 @@ import HDDSimulator.Request;
 import HDDSimulator.RequestList;
 
 public class Scan implements Strategy{
-    private int currentRequestIndexInList;
+    protected int currentRequestIndexInList;
     protected HDD hdd;
+
+    public Scan() {
+        currentRequestIndexInList = 0;
+    }
 
     @Override
     public void setHDD(HDD hdd) {
         this.hdd = hdd;
-        currentRequestIndexInList = 0;
     }
 
     @Override
     public void doOneStep() {
         if(hdd.getRequestsInHDD().getRecentlyChanged()) {
             hdd.getRequestsInHDD().sortRequests(new RequestList.ComparatorByHDDNumber());
-
             setCurrentRequestIndexInList();
         }
 
         if(hdd.isDirectionRight()) {
-            moveRight();
+            hdd.moveRight();
+            scanRight();
             if(hdd.getCurrentPosition() == hdd.getHDDRange() - 1) {
                 hdd.setDirectionRight(false);
                 setCurrentRequestIndexInList();
             }
         }
         else {
-            moveLeft();
+            hdd.moveLeft();
+            scanLeft();
             if(hdd.getCurrentPosition() == 0) {
                 hdd.setDirectionRight(true);
                 setCurrentRequestIndexInList();
@@ -47,8 +51,7 @@ public class Scan implements Strategy{
         }
     }
 
-    protected void moveRight() {
-        hdd.moveRight();
+    protected void scanRight() {
         for(int i = currentRequestIndexInList; i < hdd.getRequestsInHDD().getNumberOfRequests(); i++) {
             currentRequestIndexInList = i;
             if(hdd.getRequestsInHDD().getRequest(i).getHDDNumber() > hdd.getCurrentPosition()) {
@@ -61,8 +64,7 @@ public class Scan implements Strategy{
         }
     }
 
-    protected void moveLeft() {
-        hdd.moveLeft();
+    protected void scanLeft() {
         for(int i = currentRequestIndexInList; i >= 0; i--) {
             currentRequestIndexInList = i;
             if(hdd.getRequestsInHDD().getRequest(i).getHDDNumber() < hdd.getCurrentPosition()) {

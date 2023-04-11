@@ -27,16 +27,19 @@ public class HDD {
         this.HDDRange = HDDRange;
         this.strategy = strategy;
         this.strategy.setHDD(this);
-        if(realTimeStrategy != null)
-            this.realTimeStrategy.setHDD(this);
         currentTime = 0;
 
         waitingRequests.sortRequests(new RequestList.ComparatorByArrivalTime());
     }
 
     public HDD(int HDDRange, int initialPosition, RequestList requests, Strategy strategy, RealTimeStrategy realTimeStrategy) {
-        this(HDDRange, requests, strategy);
+        this(HDDRange, initialPosition, requests, strategy);
         this.realTimeStrategy = realTimeStrategy;
+        this.realTimeStrategy.setHDD(this);
+    }
+
+    public HDD(int HDDRange, RequestList requests, Strategy strategy, RealTimeStrategy realTimeStrategy) {
+        this(HDDRange, 0, requests, strategy, realTimeStrategy);
     }
 
     public HDD(int HDDRange, RequestList requests, Strategy strategy) {
@@ -45,15 +48,23 @@ public class HDD {
 
     // write Processing method that will call strategy.doOneStep() and realTimeStrategy.doOneStep() if it is not null, it will process requestsInHDD and waitingRequests until it is not clear
     public void process() {
+        int previousChangeCounter = 0;
         while(!waitingRequests.isEmpty() || !requestsInHDD.isEmpty()) {
             if(!requestsInHDD.isEmpty()) {
-                if(realTimeStrategy != null && requestsInHDD.getRecentlyChanged() && requestsInHDD.hasRealTimeRequests()) {
+                if(realTimeStrategy != null && requestsInHDD.hasRealTimeRequests()) {
                     realTimeStrategy.doOneStep();
                 }
                 else {
                     strategy.doOneStep();
                 }
-                requestsInHDD.swithOfChanged();
+
+                if(previousChangeCounter != requestsInHDD.getChangeCounter()) {
+                    previousChangeCounter = requestsInHDD.getChangeCounter();
+                }
+                else {
+                    requestsInHDD.swithOfChanged();
+                    previousChangeCounter = 0;
+                }
             }
             currentTime++;
             moveRequestsFromWaitingToDoing();
@@ -96,25 +107,37 @@ public class HDD {
     public int getCurrentTime() {
         return currentTime;
     }
+    public Strategy getStrategy() {
+        return strategy;
+    }
     public int getCurrentPosition() {
         return currentPosition;
     }
     public int getDirectionChangesCounter() {
         return directionChangesCounter;
     }
-    public void setCurrentPosition(int currentPosition) {
-        if(currentPosition < 0)
-            currentPosition = 0;
-        else if(currentPosition >= HDDRange)
-            currentPosition = HDDRange - 1;
+    public void increaseDirectionChangesCounter() {
+        directionChangesCounter++;
+    }
 
-        if(!isDirectionRight() && this.currentPosition < currentPosition) {
+    public void decreaseDirectionChangesCounter() {
+        directionChangesCounter--;
+    }
+    public void setCurrentPosition(int newPosition) {
+        if(newPosition < 0) {
+            newPosition = 0;
+        }
+        else if(newPosition >= HDDRange) {
+            newPosition = HDDRange - 1;
+        }
+
+        if(!isDirectionRight() && this.currentPosition < newPosition) {
             setDirectionRight(true);
         }
-        else if(isDirectionRight() && this.currentPosition > currentPosition) {
+        else if(isDirectionRight() && this.currentPosition > newPosition) {
             setDirectionRight(false);
         }
-        this.currentPosition = currentPosition;
+        this.currentPosition = newPosition;
     }
     public void moveRight() {
         setCurrentPosition(currentPosition + 1);
@@ -139,8 +162,9 @@ public class HDD {
         System.out.println("\n\n");
         System.out.println("HDD statistics:");
         System.out.println("Strategy: " + strategy.toString());
-        if(realTimeStrategy != null)
+        if(realTimeStrategy != null) {
             System.out.println("Real time strategy: " + realTimeStrategy.toString());
+        }
         showValue("Self Time: ", currentTime);
 
         int maximumWaitingTime = 0;
