@@ -1,6 +1,4 @@
-import HDDSimulator.HDD;
-import HDDSimulator.RealTimeRequest;
-import HDDSimulator.RequestList;
+import HDDSimulator.*;
 import HDDSimulator.Strategy.*;
 import HDDSimulator.RealTimeStrategy.*;
 
@@ -9,14 +7,15 @@ import java.util.Comparator;
 public class Main {
     public static void main(String[] args) {
         // variables
-        int numberOfNormalRequests = 10000;
-        int numberOfRequestsAtStart = 10;
-        int numberOfRealTimeRequests = 1000;
-        int HDDRange = 1000;
-        int arrivalTimeRange = 20000;
-        int minimumDeadline = 500;
-        int maximumDeadline =1500;
-        Comparator<RealTimeRequest> comparatorForFDScan = new RequestList.ComparatorByDeadline();
+        int numberOfNormalRequests = 1000;
+        int numberOfRequestsAtStart = 0;
+        int numberOfRealTimeRequests = 100;
+        int HDDRange = 5000;
+        int arrivalTimeRange = 8000000;
+        int minimumDeadline = 5000;
+        int maximumDeadline =50000;
+        RequestComparator<? super RealTimeRequest> comparatorForFDScan = new RequestList.ComparatorByArrivalTime();
+
 
         // create RequestList
         RequestList requestList = new RequestList(
@@ -27,6 +26,7 @@ public class Main {
                 numberOfRealTimeRequests,
                 minimumDeadline,
                 maximumDeadline);
+//        requestList.addRequest(new Request(0,4999));
 
 
         // HDDSimulator

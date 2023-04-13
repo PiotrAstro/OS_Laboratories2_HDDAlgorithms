@@ -51,7 +51,14 @@ public class Scan implements Strategy{
         }
     }
 
+    protected void normaliseCurrentRequestIndexInList() {
+        if(currentRequestIndexInList < 0) {
+            currentRequestIndexInList = 0;
+        }
+    }
+
     protected void scanRight() {
+        normaliseCurrentRequestIndexInList();
         for(int i = currentRequestIndexInList; i < hdd.getRequestsInHDD().getNumberOfRequests(); i++) {
             currentRequestIndexInList = i;
             if(hdd.getRequestsInHDD().getRequest(i).getHDDNumber() > hdd.getCurrentPosition()) {
@@ -65,6 +72,7 @@ public class Scan implements Strategy{
     }
 
     protected void scanLeft() {
+        normaliseCurrentRequestIndexInList();
         for(int i = currentRequestIndexInList; i >= 0; i--) {
             currentRequestIndexInList = i;
             if(hdd.getRequestsInHDD().getRequest(i).getHDDNumber() < hdd.getCurrentPosition()) {

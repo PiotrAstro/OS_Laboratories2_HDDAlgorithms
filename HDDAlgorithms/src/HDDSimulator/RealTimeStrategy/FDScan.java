@@ -2,6 +2,7 @@ package HDDSimulator.RealTimeStrategy;
 
 import HDDSimulator.HDD;
 import HDDSimulator.RealTimeRequest;
+import HDDSimulator.RequestComparator;
 import HDDSimulator.RequestList;
 import HDDSimulator.Strategy.Scan;
 
@@ -10,9 +11,14 @@ import java.util.Iterator;
 
 public class FDScan extends Scan implements RealTimeStrategy{
     RealTimeRequest currentRealTimeRequest;
-    Comparator<? super RealTimeRequest> comparatorIfBothAchieveable;
+    RequestComparator<? super RealTimeRequest> comparatorIfBothAchieveable;
 
-    public FDScan(Comparator<RealTimeRequest> comparatorIfBothAchieveable) {
+    public void setHDD(HDD hdd) {
+        super.setHDD(hdd);
+        comparatorIfBothAchieveable.setHDD(hdd);
+    }
+
+    public FDScan(RequestComparator<? super RealTimeRequest> comparatorIfBothAchieveable) {
         super();
         currentRealTimeRequest = null;
         this.comparatorIfBothAchieveable = comparatorIfBothAchieveable;

@@ -132,7 +132,7 @@ public class RequestList implements Iterable<Request> {
         return list.iterator();
     }
 
-    public static class ComparatorByRealTime implements Comparator<Request> {
+    public static class ComparatorByRealTime implements RequestComparator<Request> {
         private Comparator<Request> comparator;
         private Comparator<? super RealTimeRequest> comparatorForRealTime;
 
@@ -158,26 +158,81 @@ public class RequestList implements Iterable<Request> {
                 return comparatorForRealTime == null ? comparator.compare(o1, o2) : comparatorForRealTime.compare((RealTimeRequest) o1, (RealTimeRequest) o2);
             }
         }
+
+        @Override
+        public void setHDD(HDD hdd) {
+
+        }
     }
 
-    public static class ComparatorByArrivalTime implements Comparator<Request> {
+    public static class ComparatorByArrivalTime implements RequestComparator<Request> {
         @Override
         public int compare(Request o1, Request o2) {
             return o1.getArrivalTime() - o2.getArrivalTime();
         }
+
+        @Override
+        public void setHDD(HDD hdd) {
+
+        }
     }
 
-    public static class ComparatorByHDDNumber implements Comparator<Request> {
+    public static class ComparatorByHDDNumber implements RequestComparator<Request> {
         @Override
         public int compare(Request o1, Request o2) {
             return o1.getHDDNumber() - o2.getHDDNumber();
         }
+
+        @Override
+        public void setHDD(HDD hdd) {
+
+        }
     }
 
-    public static class ComparatorByDeadline implements Comparator<RealTimeRequest> {
+    public static class ComparatorByHDDCurrentDistance implements RequestComparator<Request> {
+        HDD hdd;
+        @Override
+        public int compare(Request o1, Request o2) {
+            return hddDistance(o1) - hddDistance(o2);
+        }
+
+        public int hddDistance(Request request) {
+            return Math.abs(request.getHDDNumber() - hdd.getCurrentPosition());
+        }
+
+        @Override
+        public void setHDD(HDD hdd) {
+            this.hdd = hdd;
+        }
+    }
+
+    public static class ComparatorByLeftDeadline implements RequestComparator<RealTimeRequest> {
         @Override
         public int compare(RealTimeRequest o1, RealTimeRequest o2) {
-            return 0;
+            return (o2.getArrivalTime() + o2.getDeadline()) - (o1.getArrivalTime() + o1.getDeadline());
+        }
+
+        @Override
+        public void setHDD(HDD hdd) {
+
+        }
+    }
+
+    public static class ComparatorByLongestDeadline implements RequestComparator<RealTimeRequest> {
+        ComparatorByLeftDeadline comparator;
+
+        public ComparatorByLongestDeadline() {
+            comparator = new ComparatorByLeftDeadline();
+        }
+
+        @Override
+        public int compare(RealTimeRequest o1, RealTimeRequest o2) {
+            return -comparator.compare(o1, o2);
+        }
+
+        @Override
+        public void setHDD(HDD hdd) {
+            comparator.setHDD(hdd);
         }
     }
 }

@@ -1,21 +1,21 @@
 package HDDSimulator.RealTimeStrategy;
 
-import HDDSimulator.HDD;
-import HDDSimulator.RealTimeRequest;
-import HDDSimulator.Request;
-import HDDSimulator.RequestList;
+import HDDSimulator.*;
 
 public class EDF implements RealTimeStrategy{
     private HDD hdd;
     private RealTimeRequest currentRealTimeRequest;
+    private RequestComparator<RealTimeRequest> realTimeComparator;
 
     public EDF() {
         currentRealTimeRequest = null;
+        realTimeComparator = new RequestList.ComparatorByLeftDeadline();
     }
 
     @Override
     public void setHDD(HDD hdd) {
         this.hdd = hdd;
+        realTimeComparator.setHDD(hdd);
     }
 
     @Override
@@ -26,7 +26,7 @@ public class EDF implements RealTimeStrategy{
         }
 
         if(hdd.getRequestsInHDD().getRecentlyChanged()) {
-            hdd.getRequestsInHDD().sortRequests(new RequestList.ComparatorByRealTime(new RequestList.ComparatorByArrivalTime(), new RequestList.ComparatorByDeadline()));
+            hdd.getRequestsInHDD().sortRequests(new RequestList.ComparatorByRealTime(new RequestList.ComparatorByArrivalTime(), realTimeComparator));
         }
 
         if(currentRealTimeRequest == null) {
